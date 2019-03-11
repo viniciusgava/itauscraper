@@ -1,0 +1,18 @@
+{
+  "puppeteer": {
+    "headless": true,
+    "devtools": false,
+    "timeout": 600000
+  },
+  "viewport": {
+    "width": 1024,
+    "height": 768
+  },
+  "itau": {
+    "url": "https://www.itau.com.br"
+  },
+  "download": {
+    "path": "./",
+    "filename": "ITAU_${searchDate.year}-${searchDate.month}-${searchDate.day}_${options.days}_days_before.ofx"
+  }
+}

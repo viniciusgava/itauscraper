@@ -1,0 +1,19 @@
+{
+  "name": "itauscraper",
+  "version": "1.0.0",
+  "description": "puppeteer itau scraper",
+  "main": "run.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vinicius Gava <gava.vinicius@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^7.0.1",
+    "moment": "^2.24.0",
+    "nconf": "^0.10.0",
+    "puppeteer": "^1.13.0",
+    "uuid": "^3.3.2",
+    "yargs": "^13.2.2"
+  }
+}
