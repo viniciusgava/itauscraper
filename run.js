@@ -35,7 +35,7 @@ var argv = require('yargs')
   })
 
 // Config
-nconf.env({lowerCase: true}).argv(argv)
+nconf.env({ lowerCase: true }).argv(argv)
 const environment = nconf.get('node_env')
 nconf.file(environment, './config/' + environment.toLowerCase() + '.json')
 nconf.file('default', './config/default.json')

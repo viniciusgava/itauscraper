@@ -39,7 +39,7 @@ const stepLogin = async (page, options) => {
 const stepExportOfx = async (page, options) => {
   console.log('Opening statement page...')
   // Go to extrato page
-  await page.evaluate(() => { document.querySelector('.sub-mnu').style.display = 'block'; });
+  await page.evaluate(() => { document.querySelector('.sub-mnu').style.display = 'block' })
   await page.waitFor(1000)
   await page.hover('#varejo > header > div > nav > ul > li > div > div > div:nth-child(1) > ul:nth-child(1) > li:nth-child(3) > a')
   await page.click('#varejo > header > div > nav > ul > li > div > div > div:nth-child(1) > ul:nth-child(1) > li:nth-child(3) > a')
