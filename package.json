@@ -4,16 +4,19 @@
   "description": "puppeteer itau scraper",
   "main": "run.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "standard"
   },
   "author": "Vinicius Gava <gava.vinicius@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "fs-extra": "^7.0.1",
+    "fs-extra": "^8.1.0",
     "moment": "^2.24.0",
     "nconf": "^0.10.0",
-    "puppeteer": "^1.13.0",
-    "uuid": "^3.3.2",
-    "yargs": "^13.2.2"
+    "puppeteer": "^2.0.0",
+    "uuid": "^3.3.3",
+    "yargs": "^14.2.0"
+  },
+  "devDependencies": {
+    "standard": "^14.3.1"
   }
 }

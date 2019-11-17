@@ -12,7 +12,7 @@
     "url": "https://www.itau.com.br"
   },
   "download": {
-    "path": "./",
-    "filename": "ITAU_${searchDate.year}-${searchDate.month}-${searchDate.day}_${options.days}_days_before.ofx"
+    "path": "./download",
+    "filename": "ITAU_${searchDate.year}-${searchDate.month}-${searchDate.day}_${options.days}_days_before_${searchDate.timestamp}.ofx"
   }
 }
