@@ -1,5 +1,10 @@
 # Itau Scraper
-Download Itaú OFX file using node and Puppeteer.
+Download Itaú exportable files using node and Puppeteer.
+Available file formats:
+- OFC 1.0 - Money 1995 a Money 1999
+- OFC 1.06 - Quicken 6
+- OFX - Money 2000 *(DEFAULT)*
+- TXT - It's a CSV with semi-colon
 
 ## Usage
 ```bash
@@ -23,14 +28,16 @@ docker run -v $(pwd):/usr/itauscrapper/download \
 Usage: node run.js [options]
 
 Options:
-  --help          Show help                                            [boolean]
-  --version       Show version number                                  [boolean]
-  --branch, -b    Itaú branch number, format: 0000           [string] [required]
-  --account, -c   Itaú account number, format: 00000-0       [string] [required]
-  --password, -p  Itaú account digital password(6 digits)    [number] [required]
-  --days, -d      Transaction log days                       [number] [required]
-  --node_env      Node environment
-                  [choices: "development", "production", "docker"] [default: "production"]
+  --help             Show help                                         [boolean]
+  --version          Show version number                               [boolean]
+  --branch, -b       Itaú branch number, format: 0000        [string] [required]
+  --account, -c      Itaú account number, format: 00000-0    [string] [required]
+  --password, -p     Itaú account digital password(6 digits) [number] [required]
+  --days, -d         Transaction log days                    [number] [required]
+  --file_format, -f  File format to export
+                      [choices: "ofc1", "ofc106", "ofx", "txt"] [default: "ofx"]
+  --node_env         Node environment
+        [choices: "development", "production", "docker"] [default: "production"]
 ```
 
 ## Crontab

@@ -28,6 +28,12 @@ var argv = require('yargs')
     required: true,
     type: 'number'
   })
+  .option('file_format', {
+    alias: 'f',
+    describe: 'File format to export',
+    default: 'ofx',
+    choices: ['ofc1', 'ofc106', 'ofx', 'txt']
+  })
   .option('node_env', {
     describe: 'Node environment',
     default: 'production',

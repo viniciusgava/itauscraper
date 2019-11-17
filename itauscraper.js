@@ -36,7 +36,7 @@ const stepLogin = async (page, options) => {
   console.log('Logged!')
 }
 
-const stepExportOfx = async (page, options) => {
+const stepExport = async (page, options) => {
   console.log('Opening statement page...')
   // Go to extrato page
   await page.evaluate(() => { document.querySelector('.sub-mnu').style.display = 'block' })
@@ -49,7 +49,7 @@ const stepExportOfx = async (page, options) => {
   // Select frame
   const frame = page.frames().find(frame => frame.name() === 'CORPO')
 
-  // Go to ofx export page
+  // Go to export page
   await frame.waitFor('a[title="Salvar em outros formatos"]')
   console.log('Opening export page...')
   await frame.click('a[title="Salvar em outros formatos"]')
@@ -70,19 +70,18 @@ const stepExportOfx = async (page, options) => {
   await frame.type('#Dia', searchDate.day)
   await frame.type('#Mes', searchDate.month)
   await frame.type('#Ano', searchDate.year)
-  console.log('Selecting export document type..: OFX')
-  await frame.click('.TRNinput[value=OFX]')
+  console.log('Selecting export document type..: ' + options.file_format)
+  await frame.click(getFileFormatSelector(options))
 
   const finalFilePath = path.resolve(
     options.download.path,
     eval('`' + options.download.filename + '`') // eslint-disable-line
   )
 
-  console.log('Export document final path: ', finalFilePath)
-
   console.log('Starting download...')
-  await download(frame, 'img[alt="Continuar"]', finalFilePath)
+  const finalFilePathWithExtension = await download(frame, 'img[alt="Continuar"]', finalFilePath)
   console.log('Download has been finished.')
+  console.log('Export document final path: ', finalFilePathWithExtension)
 }
 
 const stepClosePossiblePopup = async (page) => {
@@ -111,6 +110,10 @@ const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+const getFileFormatSelector = (options) => {
+  return '.TRNinput[value=' + options.file_format.toUpperCase() + ']'
+}
+
 const download = async (page, selector, finalFilePath) => {
   const downloadPath = path.resolve(os.tmpdir(), 'download', uuid())
   mkdirp(downloadPath)
@@ -121,9 +124,14 @@ const download = async (page, selector, finalFilePath) => {
 
   const filename = await waitForFileToDownload(downloadPath)
   const tempFilePath = path.resolve(downloadPath, filename)
+  const extension = path.extname(tempFilePath)
+
+  finalFilePath += extension
 
   console.log('Moving file to final path.')
   await fs.moveSync(tempFilePath, finalFilePath)
+
+  return finalFilePath
 }
 
 const waitForFileToDownload = async (downloadPath) => {
@@ -141,6 +149,7 @@ const scraper = async (options) => {
   console.log('Account Branch Number:', options.branch)
   console.log('Account number:', options.account)
   console.log('Transaction log days:', options.days)
+  console.log('File Format:', options.file_format)
 
   console.debug('Puppeter - options', options.puppeteer)
   const browser = await puppeteer.launch(options.puppeteer)
@@ -151,7 +160,7 @@ const scraper = async (options) => {
 
   await stepLogin(page, options)
   await stepClosePossiblePopup(page)
-  await stepExportOfx(page, options)
+  await stepExport(page, options)
 
   await browser.close()
 

@@ -13,6 +13,6 @@
   },
   "download": {
     "path": "./download",
-    "filename": "ITAU_${searchDate.year}-${searchDate.month}-${searchDate.day}_${options.days}_days_before_${searchDate.timestamp}.ofx"
+    "filename": "ITAU_${searchDate.year}-${searchDate.month}-${searchDate.day}_${options.days}_days_before_${searchDate.timestamp}"
   }
 }

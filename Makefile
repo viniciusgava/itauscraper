@@ -1,5 +1,5 @@
 build-docker:cleanup
-	docker build --no-cache -t viniciusgava/itauscraper:latest .
+	docker build -t viniciusgava/itauscraper:latest .
 
 publish-image:
 	docker push viniciusgava/itauscraper:latest
