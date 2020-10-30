@@ -26,13 +26,14 @@ var argv = require('yargs')
     alias: 'd',
     describe: 'Transaction log days',
     required: true,
-    type: 'number'
+    type: 'number',
+    choices: [3, 5, 7, 15, 30, 60, 90]
   })
   .option('file_format', {
     alias: 'f',
     describe: 'File format to export',
     default: 'ofx',
-    choices: ['ofc1', 'ofc106', 'ofx', 'txt']
+    choices: ['pdf', 'xls', 'txt', 'ofx', 'ofc10', 'ofc106']
   })
   .option('node_env', {
     describe: 'Node environment',
