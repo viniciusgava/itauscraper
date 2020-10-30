@@ -14,6 +14,7 @@ node run.js --branch=0000 --account=00000-0 --password=000000 --days 5
 ```
 
 ## Usage - Docker
+### WARNING: Docker image is outdated
 ```bash
 docker run -v $(pwd):/usr/itauscrapper/download \
     -e BRANCH='0000' \
