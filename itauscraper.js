@@ -41,47 +41,59 @@ const stepExport = async (page, options) => {
   // Go to extrato page
   await page.evaluate(() => { document.querySelector('.sub-mnu').style.display = 'block' })
   await page.waitFor(1000)
-  await page.hover('#varejo > header > div > nav > ul > li > div > div > div:nth-child(1) > ul:nth-child(1) > li:nth-child(3) > a')
-  await page.click('#varejo > header > div > nav > ul > li > div > div > div:nth-child(1) > ul:nth-child(1) > li:nth-child(3) > a')
-  await page.waitForNavigation()
+
+  await page.hover('#varejo > header > div.container > nav > ul > li > div > div > div:nth-child(1) > ul:nth-child(1) > li:nth-child(2) > a')
+  await page.click('#varejo > header > div.container > nav > ul > li > div > div > div:nth-child(1) > ul:nth-child(1) > li:nth-child(2) > a')
   console.log('Statement page loaded.')
 
-  // Select frame
-  const frame = page.frames().find(frame => frame.name() === 'CORPO')
+  // Close guide
+  await stepCloseStatementGuide(page)
+  console.log('Statement has been closed')
 
-  // Go to export page
-  await frame.waitFor('a[title="Salvar em outros formatos"]')
-  console.log('Opening export page...')
-  await frame.click('a[title="Salvar em outros formatos"]')
-  await frame.waitForNavigation()
-  console.log('Export page loaded.')
+  // Close menu
+  await page.evaluate(() => { document.querySelector('.sub-mnu').style.display = 'none' })
+  await page.waitFor(1000)
+  console.log('Menu has been closed')
 
-  let searchDate = moment().subtract(options.days, 'days')
-  searchDate = {
-    year: searchDate.format('YYYY'),
-    month: searchDate.format('MM'),
-    day: searchDate.format('DD'),
-    timestamp: moment().unix()
+  // Select transactions tab
+  await page.click('#btn-aba-lancamentos')
+  console.log('Selected transactions tab')
+
+  // Select all entries on the filters
+  await page.click('#extrato-filtro-lancamentos .todas-filtro-extrato-pf')
+  console.log('Selected all entries on the filters')
+
+  // Select period of days
+  await page.select('cpv-select[model=\'pc.periodoSelecionado\'] select', options.days.toString())
+  console.log('Selected period of days on the filters')
+
+  // wait load transactions
+  await page.waitFor(10000)
+
+  // configure Download Trigger
+  let triggerDownload = (fileFormat) => { exportarExtratoArquivo('formExportarExtrato', fileFormat) }// eslint-disable-line
+  if (options.file_format === 'pdf') {
+    triggerDownload = (fileFormat) => { exportarArquivoLancamentoImprimirPdf('pdf') } // eslint-disable-line
   }
-
-  console.log('Filling export date period..: ', searchDate)
-  // Fill export fields
-  await frame.waitFor('#TRNcontainer01')
-  await frame.type('#Dia', searchDate.day)
-  await frame.type('#Mes', searchDate.month)
-  await frame.type('#Ano', searchDate.year)
-  console.log('Selecting export document type..: ' + options.file_format)
-  await frame.click(getFileFormatSelector(options))
 
   const finalFilePath = path.resolve(
     options.download.path,
-    eval('`' + options.download.filename + '`') // eslint-disable-line
+    options.download.filename.interpolate({
+      days: options.days,
+      timestamp: moment().unix()
+    })
   )
 
   console.log('Starting download...')
-  const finalFilePathWithExtension = await download(frame, 'img[alt="Continuar"]', finalFilePath)
+  const finalFilePathWithExtension = download(page, triggerDownload, finalFilePath, options)
   console.log('Download has been finished.')
   console.log('Export document final path: ', finalFilePathWithExtension)
+}
+
+const stepCloseStatementGuide = async (page) => {
+  await page.waitForSelector('.feature-discovery-extrato button.hopscotch-cta', { timeout: 4000 })
+    .then(() => page.click('.feature-discovery-extrato button.hopscotch-cta')) // eslint-disable-line
+    .catch(() => {})
 }
 
 const stepClosePossiblePopup = async (page) => {
@@ -110,17 +122,13 @@ const sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-const getFileFormatSelector = (options) => {
-  return '.TRNinput[value=' + options.file_format.toUpperCase() + ']'
-}
-
-const download = async (page, selector, finalFilePath) => {
+const download = async (page, triggerDownload, finalFilePath, options) => {
   const downloadPath = path.resolve(os.tmpdir(), 'download', uuid())
   mkdirp(downloadPath)
   console.log('Temporary downloading file to:', downloadPath)
   await page._client.send('Page.setDownloadBehavior', { behavior: 'allow', downloadPath: downloadPath })
 
-  await page.click(selector)
+  await page.evaluate(triggerDownload, options.file_format)
 
   const filename = await waitForFileToDownload(downloadPath)
   const tempFilePath = path.resolve(downloadPath, filename)
@@ -166,5 +174,13 @@ const scraper = async (options) => {
 
   console.log('Itaú scraper finished.')
 }
+
+/* eslint-disable */
+String.prototype.interpolate = function (params) {
+  const names = Object.keys(params)
+  const vals = Object.values(params)
+  return new Function(...names, `return \`${this}\`;`)(...vals)
+}
+/* eslint-enable */
 
 module.exports = scraper
