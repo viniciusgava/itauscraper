@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer')
 const fs = require('fs-extra')
 const mkdirp = require('mkdirp')
 const path = require('path')
-const uuid = require('uuid/v1')
+const { v4: uuid } = require('uuid')
 const moment = require('moment')
 const os = require('os')
 
@@ -42,8 +42,11 @@ const stepExport = async (page, options) => {
   await page.evaluate(() => { document.querySelector('.sub-mnu').style.display = 'block' })
   await page.waitFor(1000)
 
-  await page.hover('#varejo > header > div.container > nav > ul > li > div > div > div:nth-child(1) > ul:nth-child(1) > li:nth-child(2) > a')
-  await page.click('#varejo > header > div.container > nav > ul > li > div > div > div:nth-child(1) > ul:nth-child(1) > li:nth-child(2) > a')
+  await page.evaluate(() => {
+    const xpath = '//a[contains(., \'saldo e extrato\')]'
+    const result = document.evaluate(xpath, document, null, XPathResult.ANY_TYPE, null)
+    result.iterateNext().click()
+  })
   console.log('Statement page loaded.')
 
   // Close guide
@@ -55,17 +58,19 @@ const stepExport = async (page, options) => {
   await page.waitFor(1000)
   console.log('Menu has been closed')
 
-  // Select transactions tab
-  await page.click('#btn-aba-lancamentos')
-  console.log('Selected transactions tab')
-
-  // Select all entries on the filters
-  await page.click('#extrato-filtro-lancamentos .todas-filtro-extrato-pf')
-  console.log('Selected all entries on the filters')
-
-  // Select period of days
-  await page.select('cpv-select[model=\'pc.periodoSelecionado\'] select', options.days.toString())
-  console.log('Selected period of days on the filters')
+  await page.waitFor(100000)
+  // TODO fix everything from here
+  // // Select transactions tab
+  // await page.click('#btn-aba-lancamentos')
+  // console.log('Selected transactions tab')
+  //
+  // // Select all entries on the filters
+  // await page.click('#extrato-filtro-lancamentos .todas-filtro-extrato-pf')
+  // console.log('Selected all entries on the filters')
+  //
+  // // Select period of days
+  // await page.select('cpv-select[model=\'pc.periodoSelecionado\'] select', options.days.toString())
+  // console.log('Selected period of days on the filters')
 
   // wait load transactions
   await page.waitFor(10000)
@@ -170,7 +175,8 @@ const scraper = async (options) => {
   await stepClosePossiblePopup(page)
   await stepExport(page, options)
 
-  await browser.close()
+  await sleep(600000)
+  // await browser.close()
 
   console.log('Itaú scraper finished.')
 }
