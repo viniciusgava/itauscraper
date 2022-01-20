@@ -33,7 +33,7 @@ var argv = require('yargs')
     alias: 'f',
     describe: 'File format to export',
     default: 'ofx',
-    choices: ['pdf', 'xls', 'txt', 'ofx', 'ofc10', 'ofc106']
+    choices: ['pdf', 'txt', 'ofx', 'ofc10', 'ofc106', 'ofc106quicken']
   })
   .option('node_env', {
     describe: 'Node environment',
