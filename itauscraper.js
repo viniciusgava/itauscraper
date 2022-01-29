@@ -17,28 +17,35 @@ const stepLogin = async (page, options) => {
   console.log('Account and branch number has been filled.')
   await page.waitForTimeout(500)
   await page.click('#btnLoginSubmit')
+
   console.log('Opening password page...')
+  await page.waitForTimeout(2000)
+  await stepAwaitRegularLoading(page)
+  await page.waitForSelector('div.modulo-login', { visible: true })
+  console.log('Password page loaded.')
 
   // Input password
-  await page.waitForSelector('div.modulo-login')
-  console.log('Password page loaded.')
   const passwordKeys = await mapPasswordKeys(page)
-  const keyClickOption = { delay: 300 }
   await page.waitForTimeout(500)
+
   console.log('Filling account password...')
   for (const digit of options.password.toString()) {
-    await passwordKeys[digit].click(keyClickOption)
+    await page.evaluate((selector) => {
+      document.querySelector(selector).click()
+    }, passwordKeys[digit])
+    await page.waitForTimeout(300)
   }
+
   console.log('Password has been filled...login...')
-  await page.waitForTimeout(500)
-  page.click('#acessar', keyClickOption)
+  await page.waitForTimeout(1000)
+  page.click('#acessar', { delay: 300 })
   await page.waitForSelector('#sectionHomePessoaFisica')
   console.log('Logged!')
 }
 
 const stepExport = async (page, options) => {
   console.log('Opening statement page...')
-  // Go to extrato page
+  // Go to statement page
   await page.evaluate(() => { document.querySelector('.sub-mnu').style.display = 'block' })
   await page.waitForTimeout(1000)
 
@@ -61,12 +68,12 @@ const stepExport = async (page, options) => {
   // Select period of days
   await page.select('cpv-select[model=\'pc.periodoSelecionado\'] select', options.days.toString())
   console.log('Selected period of days on the filters')
-  await stepAwaitStatementLoading(page)
+  await stepAwaitRegularLoading(page)
 
   // Sort by most  recent transactions first
   await page.select('cpv-select[model=\'app.ordenacao\'] select', 'maisRecente')
   console.log('Sorted by most recent transactions first')
-  await stepAwaitStatementLoading(page)
+  await stepAwaitRegularLoading(page)
 
   // configure Download Trigger
   let triggerDownload = (fileFormat) => { exportarExtratoArquivo('formExportarExtrato', fileFormat) }// eslint-disable-line
@@ -88,9 +95,9 @@ const stepExport = async (page, options) => {
   console.log('Export document final path: ', finalFilePathWithExtension)
 }
 
-const stepAwaitStatementLoading = async (page) => {
-  await page.waitForSelector('div.blockPage div.loading-nova-internet', { visible: true })
-  await page.waitForSelector('div.blockPage div.loading-nova-internet', { hidden: true })
+const stepAwaitRegularLoading = async (page) => {
+  await page.waitForSelector('div.loading-nova-internet', { visible: true, timeout: 3000 })
+  await page.waitForSelector('div.loading-nova-internet', { hidden: true })
 }
 
 const stepCloseStatementGuide = async (page) => {
@@ -112,9 +119,11 @@ const mapPasswordKeys = async (page) => {
   for (const key of keys) {
     const text = await page.evaluate(element => element.textContent, key)
     if (text.includes('ou')) {
+      const rel = await page.evaluate(element => element.getAttribute('rel'), key)
+      const selectorToClick = `a[rel="${rel}"]`
       const digits = text.split('ou').map(digit => digit.trim())
-      keyMapped[digits[0]] = key
-      keyMapped[digits[1]] = key
+      keyMapped[digits[0]] = selectorToClick
+      keyMapped[digits[1]] = selectorToClick
     }
   }
 

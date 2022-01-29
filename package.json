@@ -6,14 +6,14 @@
   "scripts": {
     "test": "standard"
   },
-  "author": "Vinicius Gava <gava.vinicius@gmail.com>",
+  "author": "Vinicius Gava",
   "license": "MIT",
   "dependencies": {
     "fs-extra": "^10.0.0",
     "mkdirp": "^1.0.4",
     "moment": "^2.29.1",
     "nconf": "^0.11.3",
-    "puppeteer": "^13.1.1",
+    "puppeteer": "^13.1.2",
     "uuid": "^8.3.2",
     "yargs": "^17.3.1"
   },
