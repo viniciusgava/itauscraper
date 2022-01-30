@@ -1,7 +1,7 @@
 const nconf = require('nconf')
 const itauscraper = require('./itauscraper.js')
 
-var argv = require('yargs')
+const argv = require('yargs')
   .env()
   .usage('Usage: node $0 [options]')
   .option('branch', {
@@ -32,8 +32,8 @@ var argv = require('yargs')
   .option('file_format', {
     alias: 'f',
     describe: 'File format to export',
-    default: 'ofx',
-    choices: ['pdf', 'xls', 'txt', 'ofx', 'ofc10', 'ofc106']
+    default: 'txt',
+    choices: ['pdf', 'txt', 'ofx', 'ofc10', 'ofc106', 'ofc106quicken']
   })
   .option('node_env', {
     describe: 'Node environment',

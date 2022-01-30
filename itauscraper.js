@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer')
 const fs = require('fs-extra')
 const mkdirp = require('mkdirp')
 const path = require('path')
-const uuid = require('uuid/v1')
+const { v4: uuid } = require('uuid')
 const moment = require('moment')
 const os = require('os')
 
@@ -15,35 +15,45 @@ const stepLogin = async (page, options) => {
   await page.type('#agencia', options.branch)
   await page.type('#conta', options.account)
   console.log('Account and branch number has been filled.')
-  await page.waitFor(500)
+  await page.waitForTimeout(500)
   await page.click('#btnLoginSubmit')
+
   console.log('Opening password page...')
+  await page.waitForTimeout(2000)
+  await stepAwaitRegularLoading(page)
+  await page.waitForSelector('div.modulo-login', { visible: true })
+  console.log('Password page loaded.')
 
   // Input password
-  await page.waitFor('div.modulo-login')
-  console.log('Password page loaded.')
   const passwordKeys = await mapPasswordKeys(page)
-  const keyClickOption = { delay: 300 }
-  await page.waitFor(500)
+  await page.waitForTimeout(500)
+
   console.log('Filling account password...')
   for (const digit of options.password.toString()) {
-    await passwordKeys[digit].click(keyClickOption)
+    await page.evaluate((selector) => {
+      document.querySelector(selector).click()
+    }, passwordKeys[digit])
+    await page.waitForTimeout(300)
   }
+
   console.log('Password has been filled...login...')
-  await page.waitFor(500)
-  page.click('#acessar', keyClickOption)
-  await page.waitFor('#sectionHomePessoaFisica')
+  await page.waitForTimeout(1000)
+  page.click('#acessar', { delay: 300 })
+  await page.waitForSelector('#sectionHomePessoaFisica')
   console.log('Logged!')
 }
 
 const stepExport = async (page, options) => {
   console.log('Opening statement page...')
-  // Go to extrato page
+  // Go to statement page
   await page.evaluate(() => { document.querySelector('.sub-mnu').style.display = 'block' })
-  await page.waitFor(1000)
+  await page.waitForTimeout(1000)
 
-  await page.hover('#varejo > header > div.container > nav > ul > li > div > div > div:nth-child(1) > ul:nth-child(1) > li:nth-child(2) > a')
-  await page.click('#varejo > header > div.container > nav > ul > li > div > div > div:nth-child(1) > ul:nth-child(1) > li:nth-child(2) > a')
+  await page.evaluate(() => {
+    const xpath = '//a[contains(., \'saldo e extrato\')]'
+    const result = document.evaluate(xpath, document, null, XPathResult.ANY_TYPE, null) // eslint-disable-line
+    result.iterateNext().click()
+  })
   console.log('Statement page loaded.')
 
   // Close guide
@@ -52,23 +62,18 @@ const stepExport = async (page, options) => {
 
   // Close menu
   await page.evaluate(() => { document.querySelector('.sub-mnu').style.display = 'none' })
-  await page.waitFor(1000)
+  await page.waitForTimeout(1000)
   console.log('Menu has been closed')
-
-  // Select transactions tab
-  await page.click('#btn-aba-lancamentos')
-  console.log('Selected transactions tab')
-
-  // Select all entries on the filters
-  await page.click('#extrato-filtro-lancamentos .todas-filtro-extrato-pf')
-  console.log('Selected all entries on the filters')
 
   // Select period of days
   await page.select('cpv-select[model=\'pc.periodoSelecionado\'] select', options.days.toString())
   console.log('Selected period of days on the filters')
+  await stepAwaitRegularLoading(page)
 
-  // wait load transactions
-  await page.waitFor(10000)
+  // Sort by most  recent transactions first
+  await page.select('cpv-select[model=\'app.ordenacao\'] select', 'maisRecente')
+  console.log('Sorted by most recent transactions first')
+  await stepAwaitRegularLoading(page)
 
   // configure Download Trigger
   let triggerDownload = (fileFormat) => { exportarExtratoArquivo('formExportarExtrato', fileFormat) }// eslint-disable-line
@@ -85,9 +90,14 @@ const stepExport = async (page, options) => {
   )
 
   console.log('Starting download...')
-  const finalFilePathWithExtension = download(page, triggerDownload, finalFilePath, options)
+  const finalFilePathWithExtension = await download(page, triggerDownload, finalFilePath, options)
   console.log('Download has been finished.')
   console.log('Export document final path: ', finalFilePathWithExtension)
+}
+
+const stepAwaitRegularLoading = async (page) => {
+  await page.waitForSelector('div.loading-nova-internet', { visible: true, timeout: 3000 })
+  await page.waitForSelector('div.loading-nova-internet', { hidden: true })
 }
 
 const stepCloseStatementGuide = async (page) => {
@@ -109,9 +119,11 @@ const mapPasswordKeys = async (page) => {
   for (const key of keys) {
     const text = await page.evaluate(element => element.textContent, key)
     if (text.includes('ou')) {
+      const rel = await page.evaluate(element => element.getAttribute('rel'), key)
+      const selectorToClick = `a[rel="${rel}"]`
       const digits = text.split('ou').map(digit => digit.trim())
-      keyMapped[digits[0]] = key
-      keyMapped[digits[1]] = key
+      keyMapped[digits[0]] = selectorToClick
+      keyMapped[digits[1]] = selectorToClick
     }
   }
 

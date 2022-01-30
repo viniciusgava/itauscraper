@@ -1,6 +1,5 @@
 {
   "puppeteer": {
-    "executablePath": "google-chrome-unstable",
-    "args": ["--no-sandbox", "--disable-setuid-sandbox"]
+    "executablePath": "google-chrome-stable"
   }
 }
