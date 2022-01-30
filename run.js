@@ -1,7 +1,7 @@
 const nconf = require('nconf')
 const itauscraper = require('./itauscraper.js')
 
-var argv = require('yargs')
+const argv = require('yargs')
   .env()
   .usage('Usage: node $0 [options]')
   .option('branch', {
