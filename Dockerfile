@@ -1,6 +1,3 @@
-# References:
-# https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md#running-puppeteer-in-docker
-# https://github.com/boxboat/fixuid
 FROM node:16-stretch-slim
 
 # Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
