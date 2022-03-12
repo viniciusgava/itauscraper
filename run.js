@@ -22,6 +22,11 @@ const argv = require('yargs')
     required: true,
     type: 'number'
   })
+  .option('name', {
+    alias: 'n',
+    describe: 'Itaú account holder name, format: Joao',
+    type: 'string'
+  })
   .option('days', {
     alias: 'd',
     describe: 'Transaction log days',
@@ -44,6 +49,7 @@ const argv = require('yargs')
 // Config
 nconf.env({ lowerCase: true }).argv(argv)
 const environment = nconf.get('node_env')
+console.log(environment)
 nconf.file(environment, './config/' + environment.toLowerCase() + '.json')
 nconf.file('default', './config/default.json')
 
@@ -52,3 +58,4 @@ const options = nconf.get()
 console.log('Starting using node environment: ' + environment)
 // Run
 itauscraper(options)
+ 
