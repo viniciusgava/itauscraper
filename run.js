@@ -58,4 +58,3 @@ const options = nconf.get()
 console.log('Starting using node environment: ' + environment)
 // Run
 itauscraper(options)
- 

@@ -61,6 +61,9 @@ Options:
         [choices: "development", "production", "docker"] [default: "production"]
 ```
 
+In order to use **multiple account holders names(Conta Conjunta)**, please, inform the option `-name`. 
+Otherwise, it will **not** work. 
+
 ## Crontab
 1. Create bash like this:
 ````bash
