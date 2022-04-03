@@ -50,6 +50,7 @@ Options:
       --version      Show version number                               [boolean]
   -b, --branch       Itaú branch number, format: 0000        [string] [required]
   -c, --account      Itaú account number, format: 00000-0    [string] [required]
+  -n, --name         Itaú account name, format: Joao                    [string]
   -p, --password     Itaú account digital password(6 digits) [number] [required]
   -d, --days         Transaction log days
                           [number] [required] [choices: 3, 5, 7, 15, 30, 60, 90]

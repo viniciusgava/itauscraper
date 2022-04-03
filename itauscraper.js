@@ -16,7 +16,24 @@ const stepLogin = async (page, options) => {
   await page.type('#conta', options.account)
   console.log('Account and branch number has been filled.')
   await page.waitForTimeout(500)
-  await page.click('#btnLoginSubmit')
+  await page.click('#loginButton')
+
+  if(!!options.name){
+    console.log('Opening account holder page...');
+    await page.waitForTimeout(2000)
+    await stepAwaitRegularLoading(page)
+    await page.waitForSelector('ul.selecao-nome-titular', { visible: true })
+    console.log('Account holder page loaded.')
+
+    const names = await page.$$('ul.selecao-nome-titular a[role="button"]');
+    for (const name of names) {
+      const text = await page.evaluate(element => element.textContent, name);
+      if(text.toUpperCase() == options.name.toUpperCase()){
+        name.click();
+        console.log('Account holder selected.')
+      }
+    }
+  }
 
   console.log('Opening password page...')
   await page.waitForTimeout(2000)
