@@ -11,7 +11,7 @@
   "dependencies": {
     "fs-extra": "^10.0.0",
     "mkdirp": "^1.0.4",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "nconf": "^0.11.3",
     "puppeteer": "^13.1.2",
     "uuid": "^8.3.2",
