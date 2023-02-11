@@ -16,7 +16,7 @@ const stepLogin = async (page, options) => {
   await page.type('#conta', options.account)
   console.log('Account and branch number has been filled.')
   await page.waitForTimeout(500)
-  await page.click('#loginButton')
+  await page.click('.login_button')
 
   if(!!options.name){
     console.log('Opening account holder page...');
