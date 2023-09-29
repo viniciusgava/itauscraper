@@ -8,6 +8,9 @@ const os = require('os')
 
 const stepLogin = async (page, options) => {
   // Open homepage and fill account info
+  console.log('Configuring user-agent...')
+  await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36')
+  await page.waitForTimeout(300)
   console.log('Opening bank homepage...')
   console.debug('Itaú url:', options.itau.url)
   await page.goto(options.itau.url)
